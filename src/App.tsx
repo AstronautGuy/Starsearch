@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect} from 'react';
 import './App.css';
+import { Input } from "@/components/ui/input";
 
 declare global {
   interface Window {
     electronAPI?: {
       sendAllowClose?: () => void;
+      sendOpenWindow?: () => void;
     };
   }
 }
 
 function App() {
-  const [count, setCount] = useState(0);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -27,7 +28,7 @@ function App() {
   }, []);
 
   return (
-      <h1>Starsearch</h1>
+      <Input type={"text"} placeholder={"Starsearch"} className={"text-2xl h-full py-0 px-6 placeholder:text-[#333] bg-[#1c1c1c] text-white"}/>
   );
 }
 

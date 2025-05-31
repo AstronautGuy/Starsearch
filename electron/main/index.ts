@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, screen } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, screen, globalShortcut } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -6,7 +6,6 @@ import os from 'node:os'
 import { update } from './update'
 
 let allowClose = false
-let win: BrowserWindow | null = null;
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -91,7 +90,8 @@ async function createWindow() {
 
   ipcMain.on('allow-close', () => {
     allowClose = true;
-    if (win) win.close();
+    if (win) win.minimize();
+    allowClose = false;
   })
 
   win.on('close', (event) => {
@@ -99,16 +99,27 @@ async function createWindow() {
         event.preventDefault()
     }
   });
-
   // Auto update
   update(win)
 }
+app.whenReady().then(() => {
+  // Register a global shortcut
+  const success = globalShortcut.register('Alt+X', () => {
+    console.log('🌌 Global shortcut triggered: open window')
 
-app.whenReady().then(createWindow)
+    if (win && !win.isDestroyed()) {
+      if (win.isMinimized()) win.restore()
+      win.focus()
+    } else {
+      createWindow()
+    }
+  })
+})
 
 app.on('window-all-closed', () => {
   win = null
   if (process.platform !== 'darwin') app.quit()
+  globalShortcut.unregister('Alt+Space')
 })
 
 app.on('second-instance', () => {
