@@ -1,0 +1,22 @@
+Copyright (c) 2025 Devansh Rajan (a.k.a. MrAstronaut)
+
+All Rights Reserved.
+
+This software, referred to as “Starsearch”, is proprietary and confidential. It is not open source.
+No part of this software may be copied, distributed, modified, reverse-engineered, sublicensed, or reused in any form without the express, written permission of the copyright holder.
+
+Unauthorized use is strictly prohibited and may result in legal consequences under applicable law.
+
+Use of this software is subject to the following conditions:
+- Personal use is permitted for the original license holder only.
+- Commercial use, distribution, or derivative works require a paid license.
+- Redistribution in any form without written approval is a violation of this license.
+
+For licensing inquiries, partnership, or purchase of commercial rights, contact:
+
+📩  [theastronautguy2@gmail.com]
+🌐  [devanshrajan.me]
+
+This license applies to the entire codebase, assets, branding, and associated materials.
+
+By accessing, running, or interacting with any part of this software, you acknowledge and agree to these terms.
