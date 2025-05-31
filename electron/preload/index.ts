@@ -1,4 +1,4 @@
-import { ipcRenderer, contextBridge } from 'electron'
+import { ipcRenderer, IpcRendererEvent, contextBridge } from 'electron'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -18,8 +18,12 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     const [channel, ...omit] = args
     return ipcRenderer.invoke(channel, ...omit)
   },
-
-  // You can expose other APTs you need here.
+  receiveFocusInput: (callback: (event: IpcRendererEvent, ...args: any[]) => void) => {
+    ipcRenderer.on('focus-input', callback);
+  },
+  removeFocusInputListener: (callback: (event: IpcRendererEvent, ...args: any[]) => void) => {
+    ipcRenderer.removeListener('focus-input', callback);
+  },  // You can expose other APTs you need here.
   // ...
 })
 

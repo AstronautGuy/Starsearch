@@ -7,7 +7,7 @@ declare global {
     electronAPI?: {
       sendAllowClose?: () => void;
       sendOpenWindow?: () => void;
-    };
+      receiveFocusInput?: (callback: () => void) => void;    };
   }
 }
 
@@ -19,6 +19,14 @@ function App() {
         window.electronAPI?.sendAllowClose?.();
       }
     };
+
+    const focusInput = () => {
+      const input = document.querySelector('input');
+      if (input) input.focus();
+    };
+
+
+    window.electronAPI?.receiveFocusInput?.(focusInput); // Use a custom exposed API OR...
 
     window.addEventListener('keydown', handleKeyDown);
 

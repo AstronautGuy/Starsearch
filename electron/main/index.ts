@@ -56,6 +56,8 @@ async function createWindow() {
     frame: false,
     alwaysOnTop: true,
     resizable: false,
+    skipTaskbar: true,
+    focusable: false,
     center: true,
     icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
     webPreferences: {
@@ -68,6 +70,10 @@ async function createWindow() {
       // contextIsolation: false,
     },
   })
+
+  win.show()
+  win.focus()
+  win.webContents.send('focus-input');
 
   if (VITE_DEV_SERVER_URL) { // #298
     win.loadURL(VITE_DEV_SERVER_URL)
@@ -91,6 +97,7 @@ async function createWindow() {
   ipcMain.on('allow-close', () => {
     allowClose = true;
     if (win) win.minimize();
+    win?.setFocusable(false)
     allowClose = false;
   })
 
@@ -99,19 +106,34 @@ async function createWindow() {
         event.preventDefault()
     }
   });
+
+  win.on('blur', () => {
+    // Optional: only minimize if the window is visible and not already minimized
+    if (win && !win.isMinimized()) {
+      win.setFocusable(false)
+      win.minimize();
+    }
+  });
   // Auto update
   update(win)
 }
 app.whenReady().then(() => {
   // Register a global shortcut
   const success = globalShortcut.register('Alt+X', () => {
-    console.log('🌌 Global shortcut triggered: open window')
+    console.log('Global shortcut triggered: open window')
 
     if (win && !win.isDestroyed()) {
-      if (win.isMinimized()) win.restore()
+      if (win.isMinimized())
+        win.setFocusable(true)
+        win.restore()
       win.focus()
+      win.webContents.send('focus-input');
     } else {
-      createWindow()
+        createWindow().then(() => {
+          win?.setFocusable(true)
+          win?.focus()
+          win?.webContents.send('focus-input');
+        })
     }
   })
 })
