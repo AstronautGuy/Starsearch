@@ -1,9 +1,12 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, screen } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
 import { update } from './update'
+
+let allowClose = false
+let win: BrowserWindow | null = null;
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -44,8 +47,17 @@ const preload = path.join(__dirname, '../preload/index.mjs')
 const indexHtml = path.join(RENDERER_DIST, 'index.html')
 
 async function createWindow() {
+  // Get the display size
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize
+
   win = new BrowserWindow({
     title: 'Main window',
+    height: Math.floor(height / 12),
+    width: Math.floor(width / 3),
+    frame: false,
+    alwaysOnTop: true,
+    resizable: false,
+    center: true,
     icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
     webPreferences: {
       preload,
@@ -61,7 +73,7 @@ async function createWindow() {
   if (VITE_DEV_SERVER_URL) { // #298
     win.loadURL(VITE_DEV_SERVER_URL)
     // Open devTool if the app is not packaged
-    win.webContents.openDevTools()
+    //win.webContents.openDevTools()
   } else {
     win.loadFile(indexHtml)
   }
@@ -76,6 +88,17 @@ async function createWindow() {
     if (url.startsWith('https:')) shell.openExternal(url)
     return { action: 'deny' }
   })
+
+  ipcMain.on('allow-close', () => {
+    allowClose = true;
+    if (win) win.close();
+  })
+
+  win.on('close', (event) => {
+    if (!allowClose){
+        event.preventDefault()
+    }
+  });
 
   // Auto update
   update(win)
